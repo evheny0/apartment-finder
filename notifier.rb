@@ -9,7 +9,7 @@ require './onliner_parser'
 
 
 CONFIG = YAML.load(File.read('config.yml'))
-RAW_ADDRESS = "https://ak.api.onliner.by/search/apartments?price%5Bmin%5D=50&price%5Bmax%5D=400&currency=usd&only_owner=true&rent_type%5B%5D=2_rooms&bounds%5Blb%5D%5Blat%5D=53.89604452913564&bounds%5Blb%5D%5Blong%5D=27.556886672973633&bounds%5Brt%5D%5Blat%5D=53.94264951038449&bounds%5Brt%5D%5Blong%5D=27.616968154907227&page=1"
+ONLINER_URL = CONFIG['urls']['onliner']
 MAIL_LOGIN = CONFIG['mail']['login']
 MAIL_PASSWORD = CONFIG['mail']['password']
 RECIPIENTS = CONFIG['recipients']
@@ -19,12 +19,9 @@ LOCAL_SMTP.enable_starttls
 
 
 class Notifier
-  attr_reader :url_string
   attr_accessor :response_hash, :db, :used_ids
 
-  def initialize(url)
-    @url_string = url
-    # puts URI.unescape(url)
+  def initialize
     open_db
   end
 
@@ -88,7 +85,7 @@ class Notifier
   end
 
   def just_do_it
-    response_hash = OnlinerParser.new(url_string).parse
+    response_hash = OnlinerParser.new(ONLINER_URL).parse
     new_publications = filter_old(response_hash['apartments'])
     puts "#{new_publications.count} new!"
     send_mails_with(new_publications)

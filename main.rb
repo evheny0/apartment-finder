@@ -1,7 +1,7 @@
 require './notifier'
 
 
-notifier = Notifier.new RAW_ADDRESS
+notifier = Notifier.new
 
 loop do
   notifier.just_do_it
